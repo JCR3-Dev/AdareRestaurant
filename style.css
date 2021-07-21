@@ -5,9 +5,10 @@ html {
 body {
     background-color: coral;
     background-image: url(images/background-adare-restaurant.jpg);
-    background-size: cover;
+    background-size: 100%;
     background-repeat: no-repeat;
     background-position: center;
+
 }
 
 .container {

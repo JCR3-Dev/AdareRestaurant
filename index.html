@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Puzzle Game</title>
+	<title>Aryll Moon</title>
 	<style>
 		body {
 			font-family: Arial, sans-serif;
@@ -32,8 +32,8 @@
 	</style>
 </head>
 <body>
-	<h1>Puzzle Game</h1>
-	<p>Click the boxes to reveal the hidden message:</p>
+	<h1>Regalo</h1>
+	<p>Haz click en las cuadrados para revelar el mensaje:</p>
 	<div class="container">
 		<div class="box"></div>
 		<div class="box"></div>
@@ -46,20 +46,16 @@
 		<div class="box"></div>
 	</div>
 	<div id="message" class="hidden">
-		<p>Congratulations, you solved the puzzle!</p>
-		<p>Click <a href="https://www.google.com">here</a> to continue.</p>
+		<p>Felicidades, eres demasiado inteligente!</p>
+		<p>Click <a href="https://youtu.be/213Uhla2GCI?t=9">aqui</a> para continuar.</p>
 	</div>
 	<script>
 		var boxes = document.querySelectorAll('.box');
 		var message = document.getElementById('message');
+		var count = 0;
 
 		function revealMessage() {
-			var count = 0;
-			for (var i = 0; i < boxes.length; i++) {
-				if (boxes[i].classList.contains('selected')) {
-					count++;
-				}
-			}
+			count++;
 			if (count === 9) {
 				message.classList.remove('hidden');
 			}
@@ -67,7 +63,7 @@
 
 		for (var i = 0; i < boxes.length; i++) {
 			boxes[i].addEventListener('click', function() {
-				this.classList.toggle('selected');
+				this.classList.add('selected');
 				revealMessage();
 			});
 		}

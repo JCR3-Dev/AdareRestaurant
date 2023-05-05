@@ -1,99 +1,129 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Mine Finding Game</title>
-    <style>
-      #grid {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        grid-template-rows: repeat(10, 1fr);
+<head>
+  <meta charset="utf-8">
+  <title>Mine Finding Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #e2e2e2;
+    }
+
+    #game-container h1 {
+      font-size: 48px;
+      margin-bottom: 32px;
+    }
+
+    #game-board {
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 600px;
+      width: 100%;
+      padding: 8px;
+      background-color: #555;
+      border-radius: 8px;
+    }
+
+    .square {
+      width: 48px;
+      height: 48px;
+      margin: 2px;
+      font-size: 24px;
+      text-align: center;
+      line-height: 48px;
+      background-color: #bbb;
+      color: #333;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .square.revealed {
+      background-color: #fff;
+      color: #000;
+      cursor: default;
+    }
+
+    .square.mine {
+      background-color: red;
+      color: white;
+    }
+
+    .square.flagged {
+      background-color: yellow;
+      cursor: default;
+    }
+
+    .square:hover {
+      background-color: #ddd;
+    }
+
+    .square:active {
+      background-color: #aaa;
+    }
+
+    #message-container {
+      margin-top: 32px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    #message-container .win {
+      color: green;
+    }
+
+    #message-container .lose {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Mine Finding Game</h1>
+    <div id="game-board"></div>
+    <div id="message-container"></div>
+  </div>
+  <script>
+    const GAME_BOARD_SIZE = 10;
+    const MINE_COUNT = 10;
+
+    let board = [];
+    let gameInProgress = true;
+    let minePositions = new Set();
+    let remainingSquares = GAME_BOARD_SIZE * GAME_BOARD_SIZE - MINE_COUNT;
+    let remainingMines = MINE_COUNT;
+
+    const gameBoardElement = document.getElementById('game-board');
+    const messageContainerElement = document.getElementById('message-container');
+
+    function initBoard() {
+      for (let i = 0; i < GAME_BOARD_SIZE; i++) {
+        board[i] = [];
+        for (let j = 0; j < GAME_BOARD_SIZE; j++) {
+          board[i][j] = {mine: false, revealed: false, flagged: false};
+        }
       }
-      .square {
-        border: 1px solid black;
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        line-height: 30px;
-        font-size: 20px;
-        cursor: pointer;
+    }
+
+    function placeMines() {
+      while (minePositions.size < MINE_COUNT) {
+        const i = Math.floor(Math.random() * GAME_BOARD_SIZE);
+        const j = Math.floor(Math.random() * GAME_BOARD_SIZE);
+        if (!board[i][j].mine) {
+          board[i][j].mine = true;
+          minePositions.add(`${i},${j}`);
+        }
       }
-      .square.flagged {
-        background-color: yellow;
-      }
-      .mine {
-        background-color: red;
-        color: white;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="grid"></div>
-    <script>
-      const grid = document.getElementById('grid');
-      const size = 10;
-      const numMines = 10;
-      let numFlags = 0;
-      let numMinesRemaining = numMines;
+    }
 
-      const generateGrid = () => {
-        for (let i = 0; i < size; i++) {
-          for (let j = 0; j < size; j++) {
-            const square = document.createElement('div');
-            square.classList.add('square');
-            square.dataset.x = i;
-            square.dataset.y = j;
-            square.addEventListener('click', () => revealSquare(square));
-            square.addEventListener('contextmenu', (event) => {
-              event.preventDefault();
-              toggleFlag(square);
-            });
-            grid.appendChild(square);
-          }
-        }
-      };
-
-      const placeMines = () => {
-        const squares = grid.querySelectorAll('.square');
-        const mines = new Set();
-        while (mines.size < numMines) {
-          const x = Math.floor(Math.random() * size);
-          const y = Math.floor(Math.random() * size);
-          mines.add(`${x},${y}`);
-          squares[x * size + y].dataset.mine = true;
-        }
-      };
-
-      const revealSquare = (square) => {
-        if (square.classList.contains('flagged')) {
-          return;
-        }
-        if (square.dataset.mine === 'true') {
-          square.classList.add('mine');
-          endGame(false);
-        } else {
-          const x = parseInt(square.dataset.x);
-          const y = parseInt(square.dataset.y);
-          const adjacentMines = countAdjacentMines(x, y);
-          square.classList.add(`num-${adjacentMines}`);
-          if (adjacentMines === 0) {
-            revealAdjacentSquares(x, y);
-          }
-          checkWin();
-        }
-      };
-
-      const countAdjacentMines = (x, y) => {
-        let count = 0;
-        for (let i = Math.max(x - 1, 0); i <= Math.min(x + 1, size - 1); i++) {
-          for (let j = Math.max(y - 1, 0); j <= Math.min(y + 1, size - 1); j++) {
-            if (grid.querySelector(`[data-x="${i}"][data-y="${j}"][data-mine="true"]`)) {
-              count++;
-            }
-          }
-        }
-        return count;
-      };
-
-      const revealAdjacentSquares = (x, y) => {
-        for (let i = Math.max(x - 1,
+    function revealSquare(i, j) {
+      if (board[i][j].flagged || board[i

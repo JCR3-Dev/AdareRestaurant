@@ -98,5 +98,8 @@
         <p>Description of Photo 6</p>
       </div>
     </div>
-  </body>
-</html>
+    <script>
+      // Add event listener to all card elements
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
